@@ -9,50 +9,496 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as ApiGoalsRouteImport } from './routes/api/goals'
+import { Route as ApiRoutinesRouteImport } from './routes/api/routines'
+import { Route as ApiSessionsRouteImport } from './routes/api/sessions'
+import { Route as ApiWorkoutsRouteImport } from './routes/api/workouts'
+import { Route as AppPlanIndexRouteImport } from './routes/_app/plan/index'
+import { Route as AppPlanGoalsRouteImport } from './routes/_app/plan/goals'
+import { Route as AppPracticeIndexRouteImport } from './routes/_app/practice/index'
+import { Route as AppPracticeSessionIdRouteImport } from './routes/_app/practice/$sessionId'
+import { Route as AppTrainIndexRouteImport } from './routes/_app/train/index'
+import { Route as AppTrainWorkoutIdRouteImport } from './routes/_app/train/$workoutId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiGoalsIdRouteImport } from './routes/api/goals.$id'
+import { Route as ApiRoutinesIdRouteImport } from './routes/api/routines.$id'
+import { Route as ApiSessionsIdRouteImport } from './routes/api/sessions.$id'
+import { Route as ApiWorkoutsIdRouteImport } from './routes/api/workouts.$id'
+import { Route as AppPlanRoutinesIndexRouteImport } from './routes/_app/plan/routines/index'
+import { Route as AppPlanRoutinesIdRouteImport } from './routes/_app/plan/routines/$id'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiGoalsRoute = ApiGoalsRouteImport.update({
+  id: '/api/goals',
+  path: '/api/goals',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRoutinesRoute = ApiRoutinesRouteImport.update({
+  id: '/api/routines',
+  path: '/api/routines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionsRoute = ApiSessionsRouteImport.update({
+  id: '/api/sessions',
+  path: '/api/sessions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWorkoutsRoute = ApiWorkoutsRouteImport.update({
+  id: '/api/workouts',
+  path: '/api/workouts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppPlanIndexRoute = AppPlanIndexRouteImport.update({
+  id: '/plan/',
+  path: '/plan/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanGoalsRoute = AppPlanGoalsRouteImport.update({
+  id: '/plan/goals',
+  path: '/plan/goals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPracticeIndexRoute = AppPracticeIndexRouteImport.update({
+  id: '/practice/',
+  path: '/practice/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPracticeSessionIdRoute = AppPracticeSessionIdRouteImport.update({
+  id: '/practice/$sessionId',
+  path: '/practice/$sessionId',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTrainIndexRoute = AppTrainIndexRouteImport.update({
+  id: '/train/',
+  path: '/train/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTrainWorkoutIdRoute = AppTrainWorkoutIdRouteImport.update({
+  id: '/train/$workoutId',
+  path: '/train/$workoutId',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGoalsIdRoute = ApiGoalsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiGoalsRoute,
+} as any)
+const ApiRoutinesIdRoute = ApiRoutinesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiRoutinesRoute,
+} as any)
+const ApiSessionsIdRoute = ApiSessionsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiSessionsRoute,
+} as any)
+const ApiWorkoutsIdRoute = ApiWorkoutsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiWorkoutsRoute,
+} as any)
+const AppPlanRoutinesIndexRoute = AppPlanRoutinesIndexRouteImport.update({
+  id: '/plan/routines/',
+  path: '/plan/routines/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanRoutinesIdRoute = AppPlanRoutinesIdRouteImport.update({
+  id: '/plan/routines/$id',
+  path: '/plan/routines/$id',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
+  '/api/goals': typeof ApiGoalsRouteWithChildren
+  '/api/routines': typeof ApiRoutinesRouteWithChildren
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
+  '/api/workouts': typeof ApiWorkoutsRouteWithChildren
+  '/plan/goals': typeof AppPlanGoalsRoute
+  '/practice/$sessionId': typeof AppPracticeSessionIdRoute
+  '/train/$workoutId': typeof AppTrainWorkoutIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/goals/$id': typeof ApiGoalsIdRoute
+  '/api/routines/$id': typeof ApiRoutinesIdRoute
+  '/api/sessions/$id': typeof ApiSessionsIdRoute
+  '/api/workouts/$id': typeof ApiWorkoutsIdRoute
+  '/plan/': typeof AppPlanIndexRoute
+  '/practice/': typeof AppPracticeIndexRoute
+  '/train/': typeof AppTrainIndexRoute
+  '/plan/routines/$id': typeof AppPlanRoutinesIdRoute
+  '/plan/routines/': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/api/goals': typeof ApiGoalsRouteWithChildren
+  '/api/routines': typeof ApiRoutinesRouteWithChildren
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
+  '/api/workouts': typeof ApiWorkoutsRouteWithChildren
+  '/': typeof AppIndexRoute
+  '/plan/goals': typeof AppPlanGoalsRoute
+  '/practice/$sessionId': typeof AppPracticeSessionIdRoute
+  '/train/$workoutId': typeof AppTrainWorkoutIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/goals/$id': typeof ApiGoalsIdRoute
+  '/api/routines/$id': typeof ApiRoutinesIdRoute
+  '/api/sessions/$id': typeof ApiSessionsIdRoute
+  '/api/workouts/$id': typeof ApiWorkoutsIdRoute
+  '/plan': typeof AppPlanIndexRoute
+  '/practice': typeof AppPracticeIndexRoute
+  '/train': typeof AppTrainIndexRoute
+  '/plan/routines/$id': typeof AppPlanRoutinesIdRoute
+  '/plan/routines': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/api/goals': typeof ApiGoalsRouteWithChildren
+  '/api/routines': typeof ApiRoutinesRouteWithChildren
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
+  '/api/workouts': typeof ApiWorkoutsRouteWithChildren
+  '/_app/': typeof AppIndexRoute
+  '/_app/plan/goals': typeof AppPlanGoalsRoute
+  '/_app/practice/$sessionId': typeof AppPracticeSessionIdRoute
+  '/_app/train/$workoutId': typeof AppTrainWorkoutIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/goals/$id': typeof ApiGoalsIdRoute
+  '/api/routines/$id': typeof ApiRoutinesIdRoute
+  '/api/sessions/$id': typeof ApiSessionsIdRoute
+  '/api/workouts/$id': typeof ApiWorkoutsIdRoute
+  '/_app/plan/': typeof AppPlanIndexRoute
+  '/_app/practice/': typeof AppPracticeIndexRoute
+  '/_app/train/': typeof AppTrainIndexRoute
+  '/_app/plan/routines/$id': typeof AppPlanRoutinesIdRoute
+  '/_app/plan/routines/': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/api/goals'
+    | '/api/routines'
+    | '/api/sessions'
+    | '/api/workouts'
+    | '/plan/goals'
+    | '/practice/$sessionId'
+    | '/train/$workoutId'
+    | '/api/auth/$'
+    | '/api/goals/$id'
+    | '/api/routines/$id'
+    | '/api/sessions/$id'
+    | '/api/workouts/$id'
+    | '/plan/'
+    | '/practice/'
+    | '/train/'
+    | '/plan/routines/$id'
+    | '/plan/routines/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/login'
+    | '/api/goals'
+    | '/api/routines'
+    | '/api/sessions'
+    | '/api/workouts'
+    | '/'
+    | '/plan/goals'
+    | '/practice/$sessionId'
+    | '/train/$workoutId'
+    | '/api/auth/$'
+    | '/api/goals/$id'
+    | '/api/routines/$id'
+    | '/api/sessions/$id'
+    | '/api/workouts/$id'
+    | '/plan'
+    | '/practice'
+    | '/train'
+    | '/plan/routines/$id'
+    | '/plan/routines'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/api/goals'
+    | '/api/routines'
+    | '/api/sessions'
+    | '/api/workouts'
+    | '/_app/'
+    | '/_app/plan/goals'
+    | '/_app/practice/$sessionId'
+    | '/_app/train/$workoutId'
+    | '/api/auth/$'
+    | '/api/goals/$id'
+    | '/api/routines/$id'
+    | '/api/sessions/$id'
+    | '/api/workouts/$id'
+    | '/_app/plan/'
+    | '/_app/practice/'
+    | '/_app/train/'
+    | '/_app/plan/routines/$id'
+    | '/_app/plan/routines/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ApiGoalsRoute: typeof ApiGoalsRouteWithChildren
+  ApiRoutinesRoute: typeof ApiRoutinesRouteWithChildren
+  ApiSessionsRoute: typeof ApiSessionsRouteWithChildren
+  ApiWorkoutsRoute: typeof ApiWorkoutsRouteWithChildren
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/goals': {
+      id: '/api/goals'
+      path: '/api/goals'
+      fullPath: '/api/goals'
+      preLoaderRoute: typeof ApiGoalsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/routines': {
+      id: '/api/routines'
+      path: '/api/routines'
+      fullPath: '/api/routines'
+      preLoaderRoute: typeof ApiRoutinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sessions': {
+      id: '/api/sessions'
+      path: '/api/sessions'
+      fullPath: '/api/sessions'
+      preLoaderRoute: typeof ApiSessionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/workouts': {
+      id: '/api/workouts'
+      path: '/api/workouts'
+      fullPath: '/api/workouts'
+      preLoaderRoute: typeof ApiWorkoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/plan/': {
+      id: '/_app/plan/'
+      path: '/plan'
+      fullPath: '/plan/'
+      preLoaderRoute: typeof AppPlanIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/plan/goals': {
+      id: '/_app/plan/goals'
+      path: '/plan/goals'
+      fullPath: '/plan/goals'
+      preLoaderRoute: typeof AppPlanGoalsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/practice/': {
+      id: '/_app/practice/'
+      path: '/practice'
+      fullPath: '/practice/'
+      preLoaderRoute: typeof AppPracticeIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/practice/$sessionId': {
+      id: '/_app/practice/$sessionId'
+      path: '/practice/$sessionId'
+      fullPath: '/practice/$sessionId'
+      preLoaderRoute: typeof AppPracticeSessionIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/train/': {
+      id: '/_app/train/'
+      path: '/train'
+      fullPath: '/train/'
+      preLoaderRoute: typeof AppTrainIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/train/$workoutId': {
+      id: '/_app/train/$workoutId'
+      path: '/train/$workoutId'
+      fullPath: '/train/$workoutId'
+      preLoaderRoute: typeof AppTrainWorkoutIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/goals/$id': {
+      id: '/api/goals/$id'
+      path: '/$id'
+      fullPath: '/api/goals/$id'
+      preLoaderRoute: typeof ApiGoalsIdRouteImport
+      parentRoute: typeof ApiGoalsRoute
+    }
+    '/api/routines/$id': {
+      id: '/api/routines/$id'
+      path: '/$id'
+      fullPath: '/api/routines/$id'
+      preLoaderRoute: typeof ApiRoutinesIdRouteImport
+      parentRoute: typeof ApiRoutinesRoute
+    }
+    '/api/sessions/$id': {
+      id: '/api/sessions/$id'
+      path: '/$id'
+      fullPath: '/api/sessions/$id'
+      preLoaderRoute: typeof ApiSessionsIdRouteImport
+      parentRoute: typeof ApiSessionsRoute
+    }
+    '/api/workouts/$id': {
+      id: '/api/workouts/$id'
+      path: '/$id'
+      fullPath: '/api/workouts/$id'
+      preLoaderRoute: typeof ApiWorkoutsIdRouteImport
+      parentRoute: typeof ApiWorkoutsRoute
+    }
+    '/_app/plan/routines/': {
+      id: '/_app/plan/routines/'
+      path: '/plan/routines'
+      fullPath: '/plan/routines/'
+      preLoaderRoute: typeof AppPlanRoutinesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/plan/routines/$id': {
+      id: '/_app/plan/routines/$id'
+      path: '/plan/routines/$id'
+      fullPath: '/plan/routines/$id'
+      preLoaderRoute: typeof AppPlanRoutinesIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppPlanGoalsRoute: typeof AppPlanGoalsRoute
+  AppPracticeSessionIdRoute: typeof AppPracticeSessionIdRoute
+  AppTrainWorkoutIdRoute: typeof AppTrainWorkoutIdRoute
+  AppPlanIndexRoute: typeof AppPlanIndexRoute
+  AppPracticeIndexRoute: typeof AppPracticeIndexRoute
+  AppTrainIndexRoute: typeof AppTrainIndexRoute
+  AppPlanRoutinesIdRoute: typeof AppPlanRoutinesIdRoute
+  AppPlanRoutinesIndexRoute: typeof AppPlanRoutinesIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppPlanGoalsRoute: AppPlanGoalsRoute,
+  AppPracticeSessionIdRoute: AppPracticeSessionIdRoute,
+  AppTrainWorkoutIdRoute: AppTrainWorkoutIdRoute,
+  AppPlanIndexRoute: AppPlanIndexRoute,
+  AppPracticeIndexRoute: AppPracticeIndexRoute,
+  AppTrainIndexRoute: AppTrainIndexRoute,
+  AppPlanRoutinesIdRoute: AppPlanRoutinesIdRoute,
+  AppPlanRoutinesIndexRoute: AppPlanRoutinesIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface ApiGoalsRouteChildren {
+  ApiGoalsIdRoute: typeof ApiGoalsIdRoute
+}
+
+const ApiGoalsRouteChildren: ApiGoalsRouteChildren = {
+  ApiGoalsIdRoute: ApiGoalsIdRoute,
+}
+
+const ApiGoalsRouteWithChildren = ApiGoalsRoute._addFileChildren(
+  ApiGoalsRouteChildren,
+)
+
+interface ApiRoutinesRouteChildren {
+  ApiRoutinesIdRoute: typeof ApiRoutinesIdRoute
+}
+
+const ApiRoutinesRouteChildren: ApiRoutinesRouteChildren = {
+  ApiRoutinesIdRoute: ApiRoutinesIdRoute,
+}
+
+const ApiRoutinesRouteWithChildren = ApiRoutinesRoute._addFileChildren(
+  ApiRoutinesRouteChildren,
+)
+
+interface ApiSessionsRouteChildren {
+  ApiSessionsIdRoute: typeof ApiSessionsIdRoute
+}
+
+const ApiSessionsRouteChildren: ApiSessionsRouteChildren = {
+  ApiSessionsIdRoute: ApiSessionsIdRoute,
+}
+
+const ApiSessionsRouteWithChildren = ApiSessionsRoute._addFileChildren(
+  ApiSessionsRouteChildren,
+)
+
+interface ApiWorkoutsRouteChildren {
+  ApiWorkoutsIdRoute: typeof ApiWorkoutsIdRoute
+}
+
+const ApiWorkoutsRouteChildren: ApiWorkoutsRouteChildren = {
+  ApiWorkoutsIdRoute: ApiWorkoutsIdRoute,
+}
+
+const ApiWorkoutsRouteWithChildren = ApiWorkoutsRoute._addFileChildren(
+  ApiWorkoutsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ApiGoalsRoute: ApiGoalsRouteWithChildren,
+  ApiRoutinesRoute: ApiRoutinesRouteWithChildren,
+  ApiSessionsRoute: ApiSessionsRouteWithChildren,
+  ApiWorkoutsRoute: ApiWorkoutsRouteWithChildren,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

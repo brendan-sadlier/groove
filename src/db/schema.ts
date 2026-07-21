@@ -13,6 +13,8 @@ import {
     text,
 } from 'drizzle-orm/sqlite-core'
 
+export * from './auth-schema'
+
 const id = () =>
   text('id')
     .primaryKey()
