@@ -147,4 +147,40 @@ body {
   button {
     -webkit-tap-highlight-color: transparent;
   }
+  /* Remove tap delay / double-tap zoom on interactive elements */
+  button,
+  a,
+  [role='button'],
+  input,
+  select,
+  textarea,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* No accidental selection on chrome; keep content + inputs selectable */
+  button,
+  a,
+  [role='button'],
+  nav,
+  header {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input,
+  textarea,
+  [contenteditable='true'] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Press feedback on touch devices (no hover state to rely on) */
+  @media (hover: none) {
+    a:active,
+    button:active,
+    [role='button']:active {
+      opacity: 0.7;
+      transition: opacity 0.1s ease;
+    }
+  }
 }

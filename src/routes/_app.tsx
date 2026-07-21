@@ -26,7 +26,9 @@ function AppLayout() {
   const handleSignOut = async () => {
     await signOut()
     await router.invalidate()
-    router.navigate({ to: '/login' })
+    router.navigate({
+      to: '/login',
+    })
   }
 
   return (

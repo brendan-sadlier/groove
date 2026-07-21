@@ -1,20 +1,25 @@
 import {
-    goalsApi,
-    routinesApi,
-    sessionsApi,
-    workoutsApi,
+  goalsApi,
+  routinesApi,
+  sessionsApi,
+  workoutsApi,
 } from '@/lib/api-client'
 import { computeShotTotals } from '@/lib/shots'
-import type { GoalWithProgress, SessionWithDrills } from '@/lib/types'
 import type {
-    GoalInput,
-    GoalUpdate,
-    RoutineInput,
-    RoutineUpdate,
-    SessionInput,
-    SessionUpdate,
-    WorkoutInput,
-    WorkoutUpdate,
+  GoalWithProgress,
+  RoutineWithItems,
+  SessionWithDrills,
+  WorkoutWithExercises,
+} from '@/lib/types'
+import type {
+  GoalInput,
+  GoalUpdate,
+  RoutineInput,
+  RoutineUpdate,
+  SessionInput,
+  SessionUpdate,
+  WorkoutInput,
+  WorkoutUpdate,
 } from '@/lib/validation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
@@ -46,6 +51,49 @@ function optimisticSession(input: SessionInput): SessionWithDrills {
       shotsAttempted: d.shotsAttempted,
       shotsMade: d.shotsMade ?? null,
       notes: d.notes ?? null,
+      sortOrder: i,
+    })),
+  }
+}
+
+function optimisticWorkout(input: WorkoutInput): WorkoutWithExercises {
+  const now = Date.now()
+  const id = `temp-${now}`
+  return {
+    id,
+    userId: '',
+    title: input.title,
+    category: input.category,
+    date: input.date,
+    durationMin: input.durationMin,
+    notes: input.notes ?? null,
+    createdAt: now,
+    updatedAt: now,
+    exercises: input.exercises.map((e, i) => ({
+      id: `${id}-${i}`,
+      workoutId: id,
+      name: e.name,
+      sets: e.sets,
+      reps: e.reps ?? null,
+      timeSec: e.timeSec ?? null,
+      weight: e.weight ?? null,
+      sortOrder: i,
+    })),
+  }
+}
+
+function optimisticRoutine(input: RoutineInput): RoutineWithItems {
+  const id = `temp-${Date.now()}`
+  return {
+    id,
+    userId: '',
+    name: input.name,
+    description: input.description,
+    items: input.items.map((it, i) => ({
+      id: `${id}-${i}`,
+      routineId: id,
+      label: it.label,
+      kind: it.kind,
       sortOrder: i,
     })),
   }
@@ -125,7 +173,19 @@ export function useCreateWorkout() {
   const router = useRouter()
   return useMutation({
     mutationFn: (input: WorkoutInput) => workoutsApi.create(input),
-    onError: (e) => toast.error(msg(e, 'Failed to save workout')),
+    onMutate: async (input) => {
+      await qc.cancelQueries({ queryKey: ['workouts'] })
+      const prev = qc.getQueryData<WorkoutWithExercises[]>(['workouts'])
+      qc.setQueryData<WorkoutWithExercises[]>(['workouts'], (old = []) => [
+        optimisticWorkout(input),
+        ...old,
+      ])
+      return { prev }
+    },
+    onError: (e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['workouts'], ctx.prev)
+      toast.error(msg(e, 'Failed to save workout'))
+    },
     onSuccess: () => toast.success('Workout saved'),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['workouts'] })
@@ -134,6 +194,7 @@ export function useCreateWorkout() {
     },
   })
 }
+
 export function useUpdateWorkout(id: string) {
   const qc = useQueryClient()
   const router = useRouter()
@@ -221,7 +282,19 @@ export function useCreateRoutine() {
   const router = useRouter()
   return useMutation({
     mutationFn: (input: RoutineInput) => routinesApi.create(input),
-    onError: (e) => toast.error(msg(e, 'Failed to save routine')),
+    onMutate: async (input) => {
+      await qc.cancelQueries({ queryKey: ['routines'] })
+      const prev = qc.getQueryData<RoutineWithItems[]>(['routines'])
+      qc.setQueryData<RoutineWithItems[]>(['routines'], (old = []) => [
+        optimisticRoutine(input),
+        ...old,
+      ])
+      return { prev }
+    },
+    onError: (e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['routines'], ctx.prev)
+      toast.error(msg(e, 'Failed to save routine'))
+    },
     onSuccess: () => toast.success('Routine saved'),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['routines'] })
@@ -229,6 +302,7 @@ export function useCreateRoutine() {
     },
   })
 }
+
 export function useUpdateRoutine(id: string) {
   const qc = useQueryClient()
   const router = useRouter()

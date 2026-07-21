@@ -7,9 +7,9 @@ import { SessionForm } from '@/components/app/practice/session-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-    useCreateSession,
-    useDeleteRoutine,
-    useUpdateRoutine,
+  useCreateSession,
+  useDeleteRoutine,
+  useUpdateRoutine,
 } from '@/lib/mutations'
 import { routineQuery, routinesQuery } from '@/lib/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
