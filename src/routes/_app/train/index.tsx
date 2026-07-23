@@ -5,11 +5,15 @@ import { PageHeader } from '@/components/app/page-header'
 import { WorkoutForm } from '@/components/app/train/workout-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { TrainingIllustration } from '@/illustrations/training'
+import { formatDuration, relativeDay } from '@/lib/date'
 import { useCreateWorkout } from '@/lib/mutations'
 import { workoutsQuery } from '@/lib/queries'
+import type { WorkoutWithExercises } from '@/lib/types'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { Dumbbell, Link, Plus } from 'lucide-react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Clock, Dumbbell, Layers, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/_app/train/')({
@@ -28,9 +32,10 @@ function TrainPage() {
   const [open, setOpen] = useState(false)
   const create = useCreateWorkout()
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <PageHeader
         title="Train"
+        subtitle={`${workouts.length} workout${workouts.length === 1 ? '' : 's'}`}
         action={
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="size-4" /> New
@@ -39,34 +44,17 @@ function TrainPage() {
       />
       {workouts.length === 0 ? (
         <EmptyState
-          icon={Dumbbell}
-          title="No workouts yet"
-          description="Add a golf-specific workout to build your training log."
-          action={<Button onClick={() => setOpen(true)}>Log a workout</Button>}
+          illustration={<TrainingIllustration className="h-42 w-42" />}
+          title="No Workouts Yet"
+          description="Add your first workout to track exercises, sets, and loads."
+          action={<Button onClick={() => setOpen(true)}>Log a Workout</Button>}
         />
       ) : (
-        <ul className="divide-y">
+        <div className="flex flex-col gap-3">
           {workouts.map((w) => (
-            <li key={w.id}>
-              <Link
-                to="/train/$workoutId"
-                params={{ workoutId: w.id }}
-                className="flex items-center justify-between px-4 py-3 active:bg-muted"
-              >
-                <div>
-                  <p className="font-medium">{w.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(w.date).toLocaleDateString()} · {w.durationMin}{' '}
-                    min
-                  </p>
-                </div>
-                <Badge variant="secondary" className="capitalize">
-                  {w.category}
-                </Badge>
-              </Link>
-            </li>
+            <WorkoutCard key={w.id} workout={w} />
           ))}
-        </ul>
+        </div>
       )}
 
       <FormDrawer open={open} onOpenChange={setOpen} title="New workout">
@@ -77,6 +65,51 @@ function TrainPage() {
           }
         />
       </FormDrawer>
-    </>
+    </div>
+  )
+}
+
+function WorkoutCard({ workout }: { workout: WorkoutWithExercises }) {
+  const totalSets = workout.exercises.reduce((s, e) => s + e.sets, 0) || 0
+  return (
+    <Link
+      to="/train/$workoutId"
+      params={{ workoutId: workout.id }}
+      className="w-full text-left transition-transform active:scale-[0.99]"
+    >
+      <Card size="sm" className="ring-foreground/10 hover:ring-foreground/20">
+        <CardContent className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-chart-2/15 text-chart-2">
+                <Dumbbell className="size-4.5" aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{workout.title}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {workout.category.charAt(0).toUpperCase() +
+                    workout.category.slice(1)}{' '}
+                  · {relativeDay(workout.date)}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="gap-1">
+              <Layers className="size-3" aria-hidden />
+              {workout.exercises.length} exercise
+              {workout.exercises.length === 1 ? '' : 's'}
+            </Badge>
+            <Badge variant="outline" className="gap-1">
+              {totalSets} sets
+            </Badge>
+            <Badge variant="outline" className="ml-auto gap-1">
+              <Clock className="size-3" aria-hidden />
+              {formatDuration(workout.durationMin)}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }

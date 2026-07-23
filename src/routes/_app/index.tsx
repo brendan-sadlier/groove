@@ -1,11 +1,22 @@
+import { ActivityRow } from '@/components/app/activity-row'
 import { EmptyState } from '@/components/app/empty-state'
 import { ListSkeleton } from '@/components/app/list-skeleton'
 import { PageHeader } from '@/components/app/page-header'
-import { Progress } from '@/components/ui/progress'
+import { GoalProgressBar } from '@/components/app/plan/goal-progress-bar'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { activityQuery, goalsQuery } from '@/lib/queries'
+import { cn } from '@/lib/utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Activity, Dumbbell, Target } from 'lucide-react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  Dumbbell,
+  ListChecks,
+  Target,
+} from 'lucide-react'
 
 export const Route = createFileRoute('/_app/')({
   loader: async ({ context }) => {
@@ -23,99 +34,228 @@ export const Route = createFileRoute('/_app/')({
   component: HomePage,
 })
 
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
 function HomePage() {
   const { data: feed } = useSuspenseQuery(activityQuery(10))
   const { data: goals } = useSuspenseQuery(goalsQuery())
+  const { user } = Route.useRouteContext()
+
+  const recent = feed.slice(0, 4)
+
+  const navigate = useNavigate()
 
   const practiceCount = feed.filter((e) => e.kind === 'practice').length
   const gymCount = feed.filter((e) => e.kind === 'gym').length
 
   return (
-    <>
-      <PageHeader title="Home" />
-      <div className="space-y-6 p-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Target className="size-4" />
-              <span className="text-xs">Recent sessions</span>
-            </div>
-            <p className="mt-1 text-2xl font-semibold">{practiceCount}</p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Dumbbell className="size-4" />
-              <span className="text-xs">Recent workouts</span>
-            </div>
-            <p className="mt-1 text-2xl font-semibold">{gymCount}</p>
-          </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={`${greeting()}, ${user.name.split(' ')[0]}`}
+        subtitle="Ready to train today?"
+      />
+      <section aria-labelledby="week-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 id="week-heading" className="text-sm font-medium font-heading">
+            This week
+          </h2>
         </div>
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard
+            label="Practice"
+            value={String(practiceCount)}
+            icon={Target}
+            accent="primary"
+          />
+          <StatCard
+            label="Workouts"
+            value={String(gymCount)}
+            icon={Dumbbell}
+            accent="chart-2"
+          />
+        </div>
+      </section>
+      {/* Quick start */}
+      <section aria-labelledby="quick-heading" className="flex flex-col gap-3">
+        <h2 id="quick-heading" className="text-sm font-medium font-heading">
+          Log activity
+        </h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            className="h-auto flex-col items-start gap-2 rounded-xl p-4"
+            onClick={() => navigate({ to: '/practice' })}
+          >
+            <Target className="size-5" aria-hidden />
+            <span className="flex flex-col items-start">
+              <span className="text-sm font-medium">Log Practice</span>
+              <span className="text-xs font-normal opacity-80">
+                Record a session
+              </span>
+            </span>
+          </Button>
+          <Button
+            variant="secondary"
+            className="h-auto flex-col items-start gap-2 rounded-xl p-4 text-primary"
+            onClick={() => navigate({ to: '/train' })}
+          >
+            <Dumbbell className="size-5" aria-hidden />
+            <span className="flex flex-col items-start">
+              <span className="text-sm font-medium">Log Workout</span>
+              <span className="text-xs font-normal text-primary/80">
+                Record your sets & reps
+              </span>
+            </span>
+          </Button>
+        </div>
+        <Button
+          variant="outline"
+          className="h-11 justify-between rounded-xl px-4"
+          onClick={() => navigate({ to: '/plan', search: { tab: 'routines' } })}
+        >
+          <span className="flex items-center gap-2">
+            <ListChecks className="size-4 text-muted-foreground" aria-hidden />
+            Start with a routine
+          </span>
+          <ArrowRight className="size-4 text-muted-foreground" aria-hidden />
+        </Button>
+      </section>
 
-        {goals.length > 0 ? (
-          <section className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium">Goals</h2>
-              <Link
-                to="/plan/goals"
-                className="text-xs text-muted-foreground underline"
-              >
-                View all
-              </Link>
-            </div>
-            <div className="space-y-3">
+      {goals.length > 0 && (
+        <section
+          aria-labelledby="goals-heading"
+          className="flex flex-col gap-3"
+        >
+          <div className="flex items-center justify-between">
+            <h2 id="goals-heading" className="text-sm font-medium font-heading">
+              Goals
+            </h2>
+            <Button
+              onClick={() => navigate({ to: '/plan/goals' })}
+              variant="link"
+              className="text-xs font-medium text-primary"
+            >
+              See all
+            </Button>
+          </div>
+          <Card size="sm">
+            <CardContent className="flex flex-col gap-4">
               {goals.slice(0, 3).map((g) => {
-                const pct =
-                  g.target > 0
-                    ? Math.min(100, Math.round((g.current / g.target) * 100))
-                    : 0
                 return (
-                  <div key={g.id} className="rounded-lg border p-3">
-                    <div className="flex items-center justify-between">
+                  <div key={g.id} className="flex flex-col gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <CalendarDays
+                        className="size-3.5 text-muted-foreground"
+                        aria-hidden
+                      />
                       <span className="text-sm font-medium">{g.title}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {g.current}/{g.target}
+                      <span className="ml-auto text-[10px] tracking-wide text-muted-foreground uppercase">
+                        {g.period}
                       </span>
                     </div>
-                    <Progress value={pct} className="mt-2" />
+                    <GoalProgressBar current={g.current} target={g.target} />
                   </div>
                 )
               })}
-            </div>
-          </section>
-        ) : null}
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium">Recent activity</h2>
+      <section aria-labelledby="recent-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 id="recent-heading" className="text-sm font-medium font-heading">
+            Recent activity
+          </h2>
+          <Button
+            variant="link"
+            type="button"
+            // onClick={() => ('history')} // TODO: add history page
+            className="text-xs font-medium text-primary"
+          >
+            See all
+          </Button>
+        </div>
+        <div className="flex flex-col gap-2">
           {feed.length === 0 ? (
             <EmptyState
               icon={Activity}
-              title="No activity yet"
-              description="Log your first session or workout to see it here."
+              title="No Activity Yet"
+              description="Log your first practice or workout to get started."
             />
           ) : (
-            <ul className="divide-y rounded-lg border">
-              {feed.map((e) => (
-                <li
-                  key={`${e.kind}-${e.id}`}
-                  className="flex items-center justify-between px-3 py-3"
-                >
-                  <div>
-                    <p className="text-sm font-medium">{e.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {e.kind === 'practice'
-                        ? `Practice · ${e.focus}`
-                        : `Gym · ${e.category} · ${e.durationMin}m`}
-                    </p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(e.date).toLocaleDateString()}
-                  </span>
-                </li>
+            <>
+              {recent.map((entry) => (
+                <ActivityRow
+                  key={entry.id}
+                  entry={entry}
+                  onClick={() =>
+                    navigate({
+                      to:
+                        entry.kind === 'practice'
+                          ? '/practice/$sessionId'
+                          : '/train/$workoutId',
+                      params:
+                        entry.kind === 'practice'
+                          ? { sessionId: entry.id }
+                          : { workoutId: entry.id },
+                    })
+                  }
+                />
               ))}
-            </ul>
+            </>
           )}
-        </section>
-      </div>
-    </>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  accent,
+}: {
+  label: string
+  value: string
+  hint?: string
+  icon: typeof Target
+  accent?: 'primary' | 'chart-2' | 'chart-3'
+}) {
+  const accentClass =
+    accent === 'primary'
+      ? 'bg-primary/12 text-primary'
+      : accent === 'chart-2'
+        ? 'bg-chart-2/15 text-chart-2'
+        : 'bg-chart-3/15 text-chart-3'
+
+  return (
+    <Card size="sm" className="justify-between">
+      <CardContent className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-muted-foreground text-sm font-medium">{label}</h3>
+          <span
+            className={cn(
+              'flex size-8 items-center justify-center rounded-lg',
+              accentClass,
+            )}
+          >
+            <Icon className="size-4" aria-hidden />
+          </span>
+        </div>
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-foreground text-2xl font-semibold tracking-tight tabular-nums">
+              {value}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

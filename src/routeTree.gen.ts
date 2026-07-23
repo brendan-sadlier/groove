@@ -27,7 +27,6 @@ import { Route as ApiGoalsIdRouteImport } from './routes/api/goals.$id'
 import { Route as ApiRoutinesIdRouteImport } from './routes/api/routines.$id'
 import { Route as ApiSessionsIdRouteImport } from './routes/api/sessions.$id'
 import { Route as ApiWorkoutsIdRouteImport } from './routes/api/workouts.$id'
-import { Route as AppPlanRoutinesIndexRouteImport } from './routes/_app/plan/routines/index'
 import { Route as AppPlanRoutinesIdRouteImport } from './routes/_app/plan/routines/$id'
 
 const AppRoute = AppRouteImport.update({
@@ -119,11 +118,6 @@ const ApiWorkoutsIdRoute = ApiWorkoutsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiWorkoutsRoute,
 } as any)
-const AppPlanRoutinesIndexRoute = AppPlanRoutinesIndexRouteImport.update({
-  id: '/plan/routines/',
-  path: '/plan/routines/',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppPlanRoutinesIdRoute = AppPlanRoutinesIdRouteImport.update({
   id: '/plan/routines/$id',
   path: '/plan/routines/$id',
@@ -149,7 +143,6 @@ export interface FileRoutesByFullPath {
   '/practice/': typeof AppPracticeIndexRoute
   '/train/': typeof AppTrainIndexRoute
   '/plan/routines/$id': typeof AppPlanRoutinesIdRoute
-  '/plan/routines/': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -170,7 +163,6 @@ export interface FileRoutesByTo {
   '/practice': typeof AppPracticeIndexRoute
   '/train': typeof AppTrainIndexRoute
   '/plan/routines/$id': typeof AppPlanRoutinesIdRoute
-  '/plan/routines': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -193,7 +185,6 @@ export interface FileRoutesById {
   '/_app/practice/': typeof AppPracticeIndexRoute
   '/_app/train/': typeof AppTrainIndexRoute
   '/_app/plan/routines/$id': typeof AppPlanRoutinesIdRoute
-  '/_app/plan/routines/': typeof AppPlanRoutinesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -216,7 +207,6 @@ export interface FileRouteTypes {
     | '/practice/'
     | '/train/'
     | '/plan/routines/$id'
-    | '/plan/routines/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -237,7 +227,6 @@ export interface FileRouteTypes {
     | '/practice'
     | '/train'
     | '/plan/routines/$id'
-    | '/plan/routines'
   id:
     | '__root__'
     | '/_app'
@@ -259,7 +248,6 @@ export interface FileRouteTypes {
     | '/_app/practice/'
     | '/_app/train/'
     | '/_app/plan/routines/$id'
-    | '/_app/plan/routines/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -400,13 +388,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWorkoutsIdRouteImport
       parentRoute: typeof ApiWorkoutsRoute
     }
-    '/_app/plan/routines/': {
-      id: '/_app/plan/routines/'
-      path: '/plan/routines'
-      fullPath: '/plan/routines/'
-      preLoaderRoute: typeof AppPlanRoutinesIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/plan/routines/$id': {
       id: '/_app/plan/routines/$id'
       path: '/plan/routines/$id'
@@ -426,7 +407,6 @@ interface AppRouteChildren {
   AppPracticeIndexRoute: typeof AppPracticeIndexRoute
   AppTrainIndexRoute: typeof AppTrainIndexRoute
   AppPlanRoutinesIdRoute: typeof AppPlanRoutinesIdRoute
-  AppPlanRoutinesIndexRoute: typeof AppPlanRoutinesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -438,7 +418,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppPracticeIndexRoute: AppPracticeIndexRoute,
   AppTrainIndexRoute: AppTrainIndexRoute,
   AppPlanRoutinesIdRoute: AppPlanRoutinesIdRoute,
-  AppPlanRoutinesIndexRoute: AppPlanRoutinesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

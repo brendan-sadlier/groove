@@ -1,17 +1,19 @@
 // src/routes/_app/plan/routines/$id.tsx
 import { ConfirmDelete } from '@/components/app/confirm-delete'
+import { EmptyState } from '@/components/app/empty-state'
 import { FormDrawer } from '@/components/app/form-drawer'
 import { PageHeader } from '@/components/app/page-header'
 import { RoutineForm } from '@/components/app/plan/routine-form'
 import { SessionForm } from '@/components/app/practice/session-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { LostIllustration } from '@/illustrations/lost'
 import {
   useCreateSession,
   useDeleteRoutine,
   useUpdateRoutine,
 } from '@/lib/mutations'
-import { routineQuery, routinesQuery } from '@/lib/queries'
+import { routineQuery } from '@/lib/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Pencil, Play, Trash2 } from 'lucide-react'
@@ -19,7 +21,7 @@ import { useState } from 'react'
 
 export const Route = createFileRoute('/_app/plan/routines/$id')({
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(routinesQuery(params.id)),
+    context.queryClient.ensureQueryData(routineQuery(params.id)),
   component: RoutineDetail,
 })
 
@@ -35,12 +37,23 @@ function RoutineDetail() {
 
   if (!routine) {
     return (
-      <>
-        <PageHeader title="Not found" />
-        <p className="p-6 text-sm text-muted-foreground">
-          This routine doesn't exist.
-        </p>
-      </>
+      <div className="flex flex-col gap-4">
+        <PageHeader title="Not found" showBack />
+        <EmptyState
+          illustration={<LostIllustration className="size-48" />}
+          title="Routines Yet"
+          description="Set a weekly or monthly target to stay on track."
+          action={
+            <Button
+              onClick={() =>
+                router.navigate({ to: '/plan', search: { tab: 'routines' } })
+              }
+            >
+              Go Back
+            </Button>
+          }
+        />
+      </div>
     )
   }
 
@@ -65,7 +78,11 @@ function RoutineDetail() {
               title="Delete routine?"
               onConfirm={() =>
                 del.mutate(id, {
-                  onSuccess: () => router.navigate({ to: '/plan/routines' }),
+                  onSuccess: () =>
+                    router.navigate({
+                      to: '/plan',
+                      search: { tab: 'routines' },
+                    }),
                 })
               }
               trigger={

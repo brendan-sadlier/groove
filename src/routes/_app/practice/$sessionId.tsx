@@ -1,15 +1,20 @@
 // src/routes/_app/practice/$sessionId.tsx
 import { ConfirmDelete } from '@/components/app/confirm-delete'
+import { EmptyState } from '@/components/app/empty-state'
 import { FormDrawer } from '@/components/app/form-drawer'
 import { PageHeader } from '@/components/app/page-header'
 import { SessionForm } from '@/components/app/practice/session-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { LostIllustration } from '@/illustrations/lost'
+import type { Intensity } from '@/lib/constants'
+import { formatDateLong } from '@/lib/date'
 import { useDeleteSession, useUpdateSession } from '@/lib/mutations'
 import { sessionQuery } from '@/lib/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Pencil, Trash2 } from 'lucide-react'
+import { CalendarDays, Flag, Flame, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/_app/practice/$sessionId')({
@@ -17,6 +22,12 @@ export const Route = createFileRoute('/_app/practice/$sessionId')({
     context.queryClient.ensureQueryData(sessionQuery(params.sessionId)),
   component: SessionDetail,
 })
+
+const intensityLabel: Record<Intensity, string> = {
+  low: 'Low Intensity',
+  moderate: 'Moderate',
+  high: 'High Intensity',
+}
 
 function SessionDetail() {
   const { sessionId } = Route.useParams()
@@ -28,90 +39,132 @@ function SessionDetail() {
 
   if (!session) {
     return (
-      <>
-        <PageHeader title="Not found" />
-        <p className="p-6 text-sm text-muted-foreground">
-          This session doesn't exist.
-        </p>
-      </>
+      <div className="flex flex-col gap-5">
+        <PageHeader title="Session" showBack />
+        <EmptyState
+          illustration={<LostIllustration className="size-48" />}
+          title="Session Not Found"
+          description="This session may have been deleted."
+        />
+      </div>
     )
   }
 
   return (
-    <>
-      <PageHeader
-        title={session.title}
-        action={
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="size-4" />
-            </Button>
-            <ConfirmDelete
-              title="Delete session?"
-              description="This removes the session and its drills."
-              onConfirm={() =>
-                del.mutate(sessionId, {
-                  onSuccess: () => router.navigate({ to: '/practice' }),
-                })
-              }
-              trigger={
-                <Button variant="ghost" size="icon">
-                  <Trash2 className="size-4" />
-                </Button>
-              }
-            />
-          </div>
-        }
-      />
-      <div className="space-y-4 p-4">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <Badge variant="secondary" className="capitalize">
-            {session.intensity}
-          </Badge>
-          <span>{session.focus}</span>
-          <span>·</span>
-          <span>{new Date(session.date).toLocaleDateString()}</span>
+    <div className="flex flex-col gap-5">
+      <PageHeader showBack title={session.title} subtitle={session.focus} />
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline" className="gap-1">
+          <CalendarDays className="size-3" aria-hidden />
+          {formatDateLong(session.date)}
+        </Badge>
+        <Badge
+          variant={
+            session.intensity === 'high'
+              ? 'destructive'
+              : session.intensity === 'moderate'
+                ? 'warning'
+                : 'success'
+          }
+          className="gap-1"
+        >
+          <Flame className="size-3" aria-hidden />
+          {intensityLabel[session.intensity]}
+        </Badge>
+      </div>
+
+      {session.notes && (
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Notes
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-pretty">
+              {session.notes}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <section className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium">Drills</h2>
+          <span className="text-xs text-muted-foreground text-center align-middle">
+            {session.drills.length} ·{' '}
+            {session.totalShotsMade != null ? (
+              <>
+                <Flag className="size-3 inline-block" aria-hidden />
+                {`${session.totalShotsMade}/${session.totalShotsAttempted}`}
+              </>
+            ) : (
+              <>
+                <Flag className="size-3 inline-block" aria-hidden />
+                {session.totalShotsAttempted}
+              </>
+            )}
+          </span>
         </div>
-        <div className="rounded-lg border p-4">
-          <p className="text-sm text-muted-foreground">Shots</p>
-          <p className="text-2xl font-semibold">
-            {session.totalShotsMade != null
-              ? `${session.totalShotsMade} / ${session.totalShotsAttempted}`
-              : session.totalShotsAttempted}
+        {session.drills.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+            No drills recorded for this session.
           </p>
-        </div>
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Drills</p>
-          {session.drills.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No drills recorded.</p>
-          ) : (
-            <ul className="divide-y rounded-lg border">
-              {session.drills.map((d) => (
-                <li
+        ) : (
+          <Card size="sm">
+            <CardContent className="flex flex-col divide-y divide-border">
+              {session.drills.map((d, i) => (
+                <div
                   key={d.id}
-                  className="flex items-center justify-between px-3 py-2"
+                  className="flex items-start content-center gap-3 py-3 first:pt-0 last:pb-0"
                 >
-                  <span>{d.name}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {d.shotsMade != null
-                      ? `${d.shotsMade}/${d.shotsAttempted}`
-                      : d.shotsAttempted}
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-muted font-mono text-xs text-muted-foreground tabular-nums">
+                    {i + 1}
                   </span>
-                </li>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{d.name}</p>
+                    {d.notes && (
+                      <p className="mt-0.5 text-xs text-muted-foreground text-pretty">
+                        {d.notes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-mono text-sm tabular-nums">
+                      {d.shotsMade != null
+                        ? `${d.shotsMade}/${d.shotsAttempted}`
+                        : d.shotsAttempted}
+                    </p>
+                  </div>
+                </div>
               ))}
-            </ul>
-          )}
-        </div>
-        {session.notes ? (
-          <div className="rounded-lg border p-4 text-sm">
-            <p className="mb-1 font-medium">Notes</p>
-            <p className="text-muted-foreground">{session.notes}</p>
-          </div>
-        ) : null}
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      <div className="grid grid-cols-2 gap-2 pt-1">
+        <Button
+          variant="outline"
+          className="flex-1 w-full"
+          onClick={() => setEditing(true)}
+        >
+          <Pencil className="size-4" aria-hidden />
+          Edit
+        </Button>
+        <ConfirmDelete
+          title="Delete session?"
+          description="This removes the session and its drills."
+          onConfirm={() =>
+            del.mutate(sessionId, {
+              onSuccess: () => router.navigate({ to: '/practice' }),
+            })
+          }
+          trigger={
+            <Button variant="destructive" className="flex-1 w-full">
+              <Trash2 className="size-4" />
+              Delete
+            </Button>
+          }
+        />
       </div>
 
       <FormDrawer open={editing} onOpenChange={setEditing} title="Edit session">
@@ -123,6 +176,6 @@ function SessionDetail() {
           }
         />
       </FormDrawer>
-    </>
+    </div>
   )
 }

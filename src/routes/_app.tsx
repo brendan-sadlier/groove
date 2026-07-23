@@ -1,4 +1,6 @@
 import { BottomNav } from '@/components/app/bottom-nav'
+import { CreateMenu } from '@/components/app/create-menu'
+import { TopBar } from '@/components/app/top-bar'
 import { signOut } from '@/lib/auth-client'
 import { getSession } from '@/lib/auth-functions'
 import {
@@ -7,6 +9,7 @@ import {
   redirect,
   useRouter,
 } from '@tanstack/react-router'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ location }) => {
@@ -31,23 +34,16 @@ function AppLayout() {
     })
   }
 
+  const [creating, setCreating] = useState(false)
+
   return (
-    <div className="min-h-dvh flex flex-col">
-      <header className="flex items-center justify-between px-4 py-3 border-b">
-        <span className="text-sm text-muted-foreground">
-          Signed in as {user.email}
-        </span>
-        <button
-          onClick={handleSignOut}
-          className="text-sm font-medium underline"
-        >
-          Sign out
-        </button>
-      </header>
-      <main className="flex-1">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
+      <TopBar user={user} handleSignOut={handleSignOut} />
+      <main className="flex-1 px-4 pt-4 pb-28">
         <Outlet />
       </main>
-      <BottomNav />
+      <BottomNav onCreate={() => setCreating(true)} />
+      <CreateMenu open={creating} onOpenChange={setCreating} />
     </div>
   )
 }

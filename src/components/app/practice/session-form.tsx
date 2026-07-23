@@ -1,8 +1,9 @@
 import {
-    NumberField,
-    SelectField,
-    TextField,
-    TextareaField,
+  DateField,
+  NumberField,
+  SelectField,
+  TextField,
+  TextareaField,
 } from '@/components/app/form-fields'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
@@ -74,8 +75,8 @@ export function SessionForm({
   const watched = form.watch('drills') ?? []
   const totals = computeShotTotals(
     watched.map((d) => ({
-      shotsAttempted: Number(d?.shotsAttempted) || 0,
-      shotsMade: d?.shotsMade == null ? null : Number(d.shotsMade),
+      shotsAttempted: Number(d.shotsAttempted) || 0,
+      shotsMade: d.shotsMade == null ? null : Number(d.shotsMade),
     })),
   )
 
@@ -86,16 +87,16 @@ export function SessionForm({
           control={form.control}
           name="title"
           label="Title"
-          placeholder="Short game practice"
+          placeholder="e.g. Short Game Circuit"
         />
         <TextField
           control={form.control}
           name="focus"
           label="Focus"
-          placeholder="Putting, chipping…"
+          placeholder="e.g. Chipping"
         />
         <div className="grid grid-cols-2 gap-3">
-          <TextField control={form.control} name="date" label="Date" />
+          <DateField control={form.control} name="date" label="Date" />
           <SelectField
             control={form.control}
             name="intensity"

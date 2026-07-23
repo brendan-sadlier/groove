@@ -1,14 +1,18 @@
 import { ConfirmDelete } from '@/components/app/confirm-delete'
+import { EmptyState } from '@/components/app/empty-state'
 import { FormDrawer } from '@/components/app/form-drawer'
 import { PageHeader } from '@/components/app/page-header'
 import { WorkoutForm } from '@/components/app/train/workout-form'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { LostIllustration } from '@/illustrations/lost'
+import { formatDateLong, formatDuration } from '@/lib/date'
 import { useDeleteWorkout, useUpdateWorkout } from '@/lib/mutations'
 import { workoutQuery } from '@/lib/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Pencil, Trash2 } from 'lucide-react'
+import { CalendarDays, Clock, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/_app/train/$workoutId')({
@@ -27,75 +31,116 @@ function WorkoutDetail() {
 
   if (!workout) {
     return (
-      <>
-        <PageHeader title="Not found" />
-        <p className="p-6 text-sm text-muted-foreground">
-          This workout doesn't exist.
-        </p>
-      </>
+      <div className="flex flex-col gap-5">
+        <PageHeader title="Workout" />
+        <EmptyState
+          illustration={<LostIllustration className="size-48" />}
+          title="Workout Not Found"
+          description="This workout may have been deleted."
+        />
+      </div>
     )
   }
 
+  const totalSets = workout.exercises.reduce((s, e) => s + e.sets, 0) || 0
+
   return (
-    <>
+    <div className="flex flex-col gap-5">
       <PageHeader
         title={workout.title}
-        action={
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="size-4" />
-            </Button>
-            <ConfirmDelete
-              title="Delete workout?"
-              description="This removes the workout and its exercises."
-              onConfirm={() =>
-                del.mutate(workoutId, {
-                  onSuccess: () => router.navigate({ to: '/train' }),
-                })
-              }
-              trigger={
-                <Button variant="ghost" size="icon">
-                  <Trash2 className="size-4" />
-                </Button>
-              }
-            />
-          </div>
-        }
+        showBack
+        subtitle={`${workout.category.charAt(0).toUpperCase() + workout.category.slice(1)} Training`}
       />
-      <div className="space-y-4 p-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Badge variant="secondary" className="capitalize">
-            {workout.category}
-          </Badge>
-          <span>
-            {new Date(workout.date).toLocaleDateString()} ·{' '}
-            {workout.durationMin} min
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline" className="gap-1">
+          <CalendarDays className="size-3" aria-hidden />
+          {formatDateLong(workout.date)}
+        </Badge>
+        <Badge variant="outline" className="gap-1">
+          <Clock className="size-3" aria-hidden />
+          {formatDuration(workout.durationMin)}
+        </Badge>
+        <Badge variant="secondary">{totalSets} total sets</Badge>
+      </div>
+
+      {workout.notes && (
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Notes
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-pretty">
+              {workout.notes}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <section className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium">Exercises</h2>
+          <span className="text-xs text-muted-foreground">
+            {workout.exercises.length} movements
           </span>
         </div>
-        <ul className="divide-y rounded-lg border">
-          {workout.exercises.map((e) => (
-            <li
-              key={e.id}
-              className="flex items-center justify-between px-3 py-2"
-            >
-              <span>{e.name}</span>
-              <span className="text-sm text-muted-foreground">
-                {e.sets}×{e.reps != null ? e.reps : `${e.timeSec}s`}
-                {e.weight != null ? ` · ${e.weight}kg` : ''}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {workout.notes ? (
-          <div className="rounded-lg border p-4 text-sm">
-            <p className="mb-1 font-medium">Notes</p>
-            <p className="text-muted-foreground">{workout.notes}</p>
-          </div>
-        ) : null}
+        {workout.exercises.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+            No exercises recorded.
+          </p>
+        ) : (
+          <Card size="sm">
+            <CardContent className="flex flex-col">
+              <div className="mb-1 grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-border pb-2 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+                <span>Exercise</span>
+                <span className="w-14 text-right">Sets×Reps</span>
+                <span className="w-12 text-right">Load</span>
+              </div>
+              {workout.exercises.map((ex) => (
+                <div
+                  key={ex.id}
+                  className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-border py-2.5 last:border-0"
+                >
+                  <span className="truncate text-sm font-medium">
+                    {ex.name}
+                  </span>
+                  <span className="w-14 text-right font-mono text-sm tabular-nums">
+                    {`${ex.sets}`}×
+                    {`${ex.reps != null ? ex.reps : `${ex.timeSec}s`}`}
+                  </span>
+                  <span className="w-12 text-right font-mono text-sm text-muted-foreground tabular-nums">
+                    {ex.weight ? `${ex.weight}` : '—'}
+                  </span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      <div className="grid grid-cols-2 gap-2 pt-1">
+        <Button
+          variant="outline"
+          className="flex-1 w-full"
+          onClick={() => setEditing(true)}
+        >
+          <Pencil className="size-4" aria-hidden />
+          Edit
+        </Button>
+        <ConfirmDelete
+          title="Delete workout?"
+          description="This removes the workout and its exercises."
+          onConfirm={() =>
+            del.mutate(workoutId, {
+              onSuccess: () => router.navigate({ to: '/train' }),
+            })
+          }
+          trigger={
+            <Button variant="destructive" className="flex-1 w-full">
+              <Trash2 className="size-4" />
+              Delete
+            </Button>
+          }
+        />
       </div>
 
       <FormDrawer open={editing} onOpenChange={setEditing} title="Edit workout">
@@ -107,6 +152,6 @@ function WorkoutDetail() {
           }
         />
       </FormDrawer>
-    </>
+    </div>
   )
 }

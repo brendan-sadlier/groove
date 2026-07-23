@@ -1,8 +1,9 @@
 import {
-    NumberField,
-    SelectField,
-    TextField,
-    TextareaField,
+  DateField,
+  NumberField,
+  SelectField,
+  TextField,
+  TextareaField,
 } from '@/components/app/form-fields'
 import { Button } from '@/components/ui/button'
 import { FieldGroup, FieldLegend, FieldSet } from '@/components/ui/field'
@@ -155,7 +156,7 @@ export function WorkoutForm({
             label="Duration (min)"
           />
         </div>
-        <TextField control={form.control} name="date" label="Date" />
+        <DateField control={form.control} name="date" label="Date" />
 
         <FieldSet>
           <FieldLegend variant="label">Exercises</FieldLegend>
