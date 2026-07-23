@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
-import { LandPlot } from 'lucide-react';
+import { GrooveIcon } from '../icons/groove-icon';
 import { UserAvatar } from './user-avatar';
 
 export function TopBar({
@@ -19,10 +19,8 @@ export function TopBar({
           className="flex items-center gap-2"
           aria-label="Groove home"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <LandPlot className="size-4.5" aria-hidden />
-          </span>
-          <span className="relative top-px text-xl font-bold font-heading tracking-tight leading-tight">
+          <GrooveIcon className="size-8" />
+          <span className="relative text-xl font-bold font-heading tracking-tight leading-tight">
             Groove
           </span>
         </button>

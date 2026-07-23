@@ -3,6 +3,7 @@ import { EmptyState } from '@/components/app/empty-state'
 import { ListSkeleton } from '@/components/app/list-skeleton'
 import { PageHeader } from '@/components/app/page-header'
 import { GoalProgressBar } from '@/components/app/plan/goal-progress-bar'
+import { ActivityIllustration } from '@/components/illustrations/activity'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { activityQuery, goalsQuery } from '@/lib/queries'
@@ -10,7 +11,6 @@ import { cn } from '@/lib/utils'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
-  Activity,
   ArrowRight,
   CalendarDays,
   Dumbbell,
@@ -100,13 +100,13 @@ function HomePage() {
           </Button>
           <Button
             variant="secondary"
-            className="h-auto flex-col items-start gap-2 rounded-xl p-4 text-primary"
+            className="h-auto flex-col items-start gap-2 rounded-xl p-4 text-primary dark:text-secondary-foreground"
             onClick={() => navigate({ to: '/train' })}
           >
             <Dumbbell className="size-5" aria-hidden />
             <span className="flex flex-col items-start">
               <span className="text-sm font-medium">Log Workout</span>
-              <span className="text-xs font-normal text-primary/80">
+              <span className="text-xs font-normal text-primary/80 dark:text-muted-foreground">
                 Record your sets & reps
               </span>
             </span>
@@ -171,19 +171,19 @@ function HomePage() {
           <h2 id="recent-heading" className="text-sm font-medium font-heading">
             Recent activity
           </h2>
-          <Button
+          {/* <Button
             variant="link"
             type="button"
             // onClick={() => ('history')} // TODO: add history page
             className="text-xs font-medium text-primary"
           >
             See all
-          </Button>
+          </Button> */}
         </div>
         <div className="flex flex-col gap-2">
           {feed.length === 0 ? (
             <EmptyState
-              icon={Activity}
+              illustration={<ActivityIllustration className="size-24" />}
               title="No Activity Yet"
               description="Log your first practice or workout to get started."
             />

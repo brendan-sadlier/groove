@@ -1,13 +1,12 @@
 import { RegisterSW } from '@/components/app/register-sw'
 import { Toaster } from '@/components/ui/sonner'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import { ThemeProvider } from '@/components/theme-provider'
 import type { QueryClient } from '@tanstack/react-query'
 import appCss from '../styles.css?url'
 
@@ -33,19 +32,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: 'apple-mobile-web-app-title', content: 'Groove' },
         {
           name: 'theme-color',
-          content: '#ffffff',
+          content: '#f9f9f9',
           media: '(prefers-color-scheme: light)',
         },
         {
           name: 'theme-color',
-          content: '#0a0a0a',
+          content: '#171717',
           media: '(prefers-color-scheme: dark)',
         },
       ],
       links: [
         { rel: 'stylesheet', href: appCss },
         { rel: 'manifest', href: '/manifest.webmanifest' },
-        { rel: 'apple-touch-icon', href: '/logo192.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
         {
           rel: 'icon',
@@ -66,21 +65,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
-        <RegisterSW />
-        <Toaster position="top-center" />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
+        <ThemeProvider defaultTheme="system" storageKey="theme">
+          {children}
+          <RegisterSW />
+          <Toaster position="top-center" />
+          <Scripts />
+        </ThemeProvider>
       </body>
     </html>
   )

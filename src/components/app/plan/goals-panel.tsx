@@ -1,10 +1,10 @@
 // src/components/plan/goals-panel.tsx
 import { EmptyState } from '@/components/app/empty-state'
 import { FormDrawer } from '@/components/app/form-drawer'
+import { TargetIllustration } from '@/components/illustrations/target'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { TargetIllustration } from '@/illustrations/target'
 import { useDeleteGoal, useUpdateGoal } from '@/lib/mutations'
 import { goalsQuery } from '@/lib/queries'
 import type { GoalWithProgress } from '@/lib/types'

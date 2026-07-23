@@ -5,13 +5,13 @@ import { FormDrawer } from '@/components/app/form-drawer'
 import { PageHeader } from '@/components/app/page-header'
 import { RoutineForm } from '@/components/app/plan/routine-form'
 import { SessionForm } from '@/components/app/practice/session-form'
+import { LostIllustration } from '@/components/illustrations/lost'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { LostIllustration } from '@/illustrations/lost'
 import {
-  useCreateSession,
-  useDeleteRoutine,
-  useUpdateRoutine,
+    useCreateSession,
+    useDeleteRoutine,
+    useUpdateRoutine,
 } from '@/lib/mutations'
 import { routineQuery } from '@/lib/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'

@@ -1,10 +1,12 @@
-const VERSION = 'v1'
+const VERSION = 'v3'
 const STATIC_CACHE = `groove-static-${VERSION}`
 const PRECACHE = [
   '/offline.html',
   '/manifest.webmanifest',
   '/logo192.png',
   '/logo512.png',
+  '/apple-touch-icon.png',
+  '/groove.svg',
 ]
 
 self.addEventListener('install', (event) => {

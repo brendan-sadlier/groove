@@ -1,14 +1,15 @@
-import { History, LogOut, Settings } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Button } from '../ui/button'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
+import { ThemeToggle } from './theme-toggle'
 
 export function UserAvatar({
   user,
@@ -35,14 +36,7 @@ export function UserAvatar({
       />
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <History />
-            History
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings />
-            Settings
-          </DropdownMenuItem>
+          <DropdownMenuItem render={<ThemeToggle />} />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -57,7 +51,7 @@ export function UserAvatar({
               Log Out
             </Button>
           }
-        ></DropdownMenuItem>
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   )
